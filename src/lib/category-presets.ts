@@ -1,6 +1,6 @@
 import type { Category, Discipline, Gender } from "$lib/data"
 
-export const outdoor = (["M", "W"] as Gender[]).map((gender) => [
+export const outdoor = (["M", "W"] as Gender[]).map(gender => [
   {
     name: "R" + gender,
     bowType: "R",
@@ -110,8 +110,8 @@ export const outdoor = (["M", "W"] as Gender[]).map((gender) => [
     targetSize: 122,
   },
 ] as Category<"target">[])
-  .map((cs: Category<"target">[]) =>
-    cs.map((c: Category<"target">) => {
+  .map((cs) =>
+    cs.map((c) => {
       c.id = crypto.randomUUID()
       return c
     }),

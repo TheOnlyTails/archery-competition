@@ -1,16 +1,17 @@
 <script lang="ts">
   import { Button, ComboBox, RadioButton } from "fluent-svelte"
-  import { type Category, competition } from "$lib/data"
+  import { type Category, competition, type Discipline } from "$lib/data"
   import { custom, indoor, outdoor } from "$lib/category-presets"
   import { Card, CategoryCard } from "$lib"
-  import { derived } from "svelte/store"
+
   import { writable } from "svelte-local-storage-store"
+  import { derived } from "svelte/store"
+  import { crossfade } from "svelte/transition"
+  import { circOut } from "svelte/easing"
 
   import Add from "@fluentui/svg-icons/icons/add_28_regular.svg?raw"
   import Clear from "@fluentui/svg-icons/icons/delete_16_regular.svg?raw"
   import Reset from "@fluentui/svg-icons/icons/arrow_reset_48_filled.svg?raw"
-  import { crossfade } from "svelte/transition"
-  import { circOut } from "svelte/easing"
 
   const [send, receive] = crossfade({
     duration: d => Math.sqrt(d * 200),
@@ -30,21 +31,18 @@
     },
   })
 
-  const presetMap: { [discipline: string]: { [preset: string]: Category<typeof $competition.discipline>[] } } = {
-    target: {
+  const presetMap: { [d: Discipline]: { [p: string]: Category<typeof d>[] } } = {
+    "target": {
       outdoor, indoor,
     },
   }
 
-  const presetName = writable("presetName", Object.keys(presetMap[$competition.discipline])[0] ?? "custom")
+  const presetName = writable("presetName", Object.keys(presetMap?.[$competition.discipline] ?? {})?.[0] ?? "custom")
   const preset = derived(presetName, (name) => {
     return (presetMap[$competition.discipline]?.[name] ?? presetMap[$competition.discipline]?.[1]) ?? custom
   })
 
-  preset.subscribe(value => {
-    // noinspection JSUnreachableSwitchBranches
-    $competition.categories = value
-  })
+  preset.subscribe(value => $competition.categories = value)
 
   $: {
     try {
@@ -66,7 +64,7 @@
   const newCategory = () => {
     $competition.categories = [
       ...$competition.categories,
-      { id: crypto.randomUUID() },
+      { id: crypto.randomUUID(), archers: [] },
     ]
   }
 
@@ -93,12 +91,12 @@
     {/if}
     <RadioButton bind:group={$presetName} value="custom">Custom</RadioButton>
 
-    <Button variant="accent" on:click={clearAll} form="">
+    <Button variant="accent" on:click={clearAll} type="button">
       {@html Clear} &nbsp; Clear All
     </Button>
 
     {#if $presetName !== "custom"}
-      <Button variant="accent" on:click={resetToPreset} form="">
+      <Button variant="accent" on:click={resetToPreset} type="button">
         {@html Reset} &nbsp; Reset to {$presetName.charAt(0).toUpperCase() + $presetName.slice(1)} Preset
       </Button>
     {/if}
@@ -106,7 +104,7 @@
 
   <div class="comp-category-selector-space">
     {#each $competition.categories as category, i (category.id)}
-      <div class="transition-wrapper" in:receive={{ key: category.id }} out:send={{ key: category.id }}>
+      <div in:receive={{ key: category.id }} out:send={{ key: category.id }}>
         <CategoryCard
           bind:category
           discipline={$competition.discipline}

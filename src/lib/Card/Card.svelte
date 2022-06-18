@@ -3,9 +3,9 @@
   export { className as class }
 </script>
 
-<div class="card {className}" on:click {...$$restProps}>
+<article class="card {className}" on:click {...$$restProps}>
   <slot />
-</div>
+</article>
 
 <style lang="scss">
   .card {

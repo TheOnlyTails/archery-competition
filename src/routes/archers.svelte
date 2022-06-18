@@ -3,7 +3,7 @@
   import { competition } from "$lib/data"
   import { parse } from "csv-parse/browser/esm/sync"
   import { InfoBar, TextBlock } from "fluent-svelte"
-  import { afterNavigate } from "$app/navigation"
+  import { beforeNavigate } from "$app/navigation"
 
   import Upload from "@fluentui/svg-icons/icons/attach_24_regular.svg?raw"
   import "fluent-svelte/Button/Button.scss"
@@ -12,7 +12,7 @@
   $: fileName = filePath?.slice(filePath?.lastIndexOf(`\\`) + 1) ?? ""
   let archers: Archer[] = []
 
-  afterNavigate(({ to }) => {
+  beforeNavigate(({ to }) => {
     if (to.pathname === "/targets") {
       $competition.categories = $competition.categories.map(category => {
         const className = (category.age ?? "") + category.gender

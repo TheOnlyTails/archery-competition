@@ -72,7 +72,7 @@
   </div>
 
   {#if currentPage < pages.length - 1}
-    <Button variant="accent" style="cursor: pointer" href={pages[currentPage + 1]?.path}>
+    <Button variant="accent" style="cursor: pointer" href={pages[currentPage + 1].path}>
       Next Page &nbsp; {@html Next}
     </Button>
   {:else}
